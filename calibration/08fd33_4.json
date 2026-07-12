@@ -1,0 +1,13 @@
+{
+  "video": "08fd33_4.mp4",
+  "frame_index": 600,
+  "note": "Points derived from least-squares fits of the visible pitch lines in frame 600 (the most zoomed-out frame of the clip). Mean reprojection residual ~1.0 m; verified by projecting the pitch model back onto the frame. The near touchline is occluded by the dugout and the far touchline sits at the LED board base, so accuracy is best in the midfield-to-right-box region.",
+  "points": [
+    {"image": [1157.3, 335.1], "pitch": "right_pen_top_corner"},
+    {"image": [1688.3, 687.0], "pitch": "right_pen_bottom_corner"},
+    {"image": [2348.6, 600.0], "pitch": "right_pen_bottom_goal_line"},
+    {"image": [195.1, 322.4], "pitch": "halfway_top"},
+    {"image": [211.8, 455.0], "pitch": "center_circle_top"},
+    {"image": [231.4, 609.9], "pitch": "center_circle_bottom"}
+  ]
+}

@@ -1,0 +1,23 @@
+.venv/
+__pycache__/
+*.pyc
+
+# large binaries
+models/*.pt
+data/videos/*
+!data/videos/.gitkeep
+output/tracking/*
+!output/tracking/.gitkeep
+output/formations/*
+!output/formations/.gitkeep
+output/*.png
+output/*.log
+output/*.err
+output/*.pid
+
+# reference clones, not part of this repo
+reference_repos/
+
+# training artifacts
+runs/
+datasets/
