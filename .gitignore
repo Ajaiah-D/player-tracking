@@ -21,3 +21,7 @@ reference_repos/
 # training artifacts
 runs/
 datasets/
+
+# downloaded open datasets and shape analysis outputs
+data/metrica/
+output/shape/
