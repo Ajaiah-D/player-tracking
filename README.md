@@ -113,6 +113,32 @@ close calls are visible instead of hidden.
 
 ![projected pitch model over frame 600](docs/images/homography_check_08fd33_4.png)
 
+## Team shape analysis on full matches
+
+The video pipeline covers 30 s clips; club work needs full matches.
+`analyze_shape.py` runs team-shape metrics (defensive line, front line,
+centroid, length, width, compactness) split by phase of play on
+Metrica Sports' open full-match tracking data. The metric code
+(`soccervision/shape.py`) doesn't depend on the data source, so the
+same metrics can run on the pipeline's output or a provider feed.
+
+```
+python scripts/download_metrica.py --game 1
+python analyze_shape.py --game 1 --open    # builds everything, opens the report
+```
+
+This also writes `output/shape/metrica_game1/report.html`: a
+self-contained match report for coaching staff (open it in any browser;
+no Python needed). It has key findings, a minute-by-minute block
+timeline with hover values, average-shape pitch maps per window, and a
+15-minute breakdown, all switchable between with and without the ball.
+
+![block height, Metrica game 1](docs/images/block_height_metrica_game1.png)
+
+How it is built, why each choice was made, the sanity checks that
+caught two bugs, and how to rebuild it on other data:
+[docs/shape-analysis.md](docs/shape-analysis.md).
+
 ## Setup
 
 ```
@@ -159,6 +185,7 @@ and team assignment; it skips pitch coordinates and formations.
 ```
 soccervision/        pipeline modules (detection, tracking, teams,
                      camera_motion, pitch, possession, formation, annotate)
+                     + metrica, shape, shape_plot for full-match analysis
 run_pipeline.py      end-to-end CLI
 calibrate.py         interactive homography calibration tool
 train_detector.py    YOLOv8 fine-tuning on the Roboflow dataset
@@ -167,5 +194,8 @@ calibration/         per-video homography calibration JSON
 data/videos/         input clips (gitignored)
 output/tracking/     tracks, caches, annotated videos
 output/formations/   formation reports
-docs/                calibration guide
+docs/                calibration guide, shape-analysis write-up, progress log
+analyze_shape.py     full-match team shape analysis (Metrica data)
+scripts/             dataset download helpers
+tests/               unit tests (python -m pytest tests)
 ```

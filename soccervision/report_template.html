@@ -1,0 +1,598 @@
+<title>__PAGE_TITLE__</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap">
+<style>
+/* Layout: a matchday analysis sheet. Scoreboard masthead, findings, then
+   one phase switch driving three views (timeline, pitch maps, table). */
+:root {
+  --bg: #f4f6f2;
+  --surface: #ffffff;
+  --ink: #15211b;
+  --ink-2: #4a5750;
+  --ink-3: #75817b;
+  --rule: #dbe1da;
+  --pitch: #e3ece0;
+  --pitch-line: #ffffff;
+  --home: #2a78d6;
+  --away: #eb6834;
+  --control: #15211b;
+  --control-ink: #ffffff;
+  --font-display: "Barlow Condensed", "Arial Narrow", "Roboto Condensed", sans-serif;
+  --font-body: "Barlow", "Segoe UI", system-ui, sans-serif;
+  --radius: 6px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #101612; --surface: #172019; --ink: #eef2ee; --ink-2: #b3bdb6; --ink-3: #87928b;
+    --rule: #28332c; --pitch: #1c2a21; --pitch-line: #3a4e41; --home: #3987e5; --away: #d95926;
+    --control: #eef2ee; --control-ink: #101612; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #101612; --surface: #172019; --ink: #eef2ee; --ink-2: #b3bdb6; --ink-3: #87928b;
+  --rule: #28332c; --pitch: #1c2a21; --pitch-line: #3a4e41; --home: #3987e5; --away: #d95926;
+  --control: #eef2ee; --control-ink: #101612; color-scheme: dark;
+}
+
+body { background: var(--bg); color: var(--ink); font: 400 15px/1.5 var(--font-body); margin: 0; }
+[hidden] { display: none !important; }
+.wrap { max-width: 1080px; margin: 0 auto; padding-inline: 20px; padding-block: 28px 56px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 40px; }
+h1, h2, h3 { font-family: var(--font-display); font-weight: 600; text-wrap: balance; margin: 0; letter-spacing: 0.01em; }
+h2 { font-size: 26px; line-height: 1.1; }
+h3 { font-size: 19px; }
+p { margin: 0; }
+.eyebrow { font: 600 12px/1.2 var(--font-body); letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); }
+.muted { color: var(--ink-2); }
+.num { font-variant-numeric: tabular-nums; }
+.team-home { --c: var(--home); }
+.team-away { --c: var(--away); }
+.chip { display: inline-block; width: 10px; height: 10px; border-radius: 2px; background: var(--c); flex: none; }
+
+/* masthead */
+.masthead { display: grid; gap: 14px; }
+.scoreline { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; font-family: var(--font-display); }
+.scoreline .side { display: inline-flex; align-items: center; gap: 10px; font-size: clamp(30px, 6vw, 48px); font-weight: 600; }
+.scoreline .side .chip { width: 14px; height: 14px; }
+.scoreline .score { font-size: clamp(40px, 9vw, 72px); font-weight: 700; line-height: 0.9; font-variant-numeric: tabular-nums; }
+.goals { display: flex; flex-wrap: wrap; gap: 6px 18px; list-style: none; margin: 0; padding: 0; color: var(--ink-2); font-size: 14px; }
+.goals li { display: inline-flex; align-items: center; gap: 7px; }
+.goals b { font-family: var(--font-display); font-size: 16px; color: var(--ink); font-weight: 600; }
+.facts { display: flex; flex-wrap: wrap; gap: 10px 32px; margin: 4px 0 0; padding-top: 14px; border-top: 1px solid var(--rule); }
+.facts div { display: grid; gap: 2px; }
+.facts dt { font: 600 11px/1.2 var(--font-body); letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); }
+.facts dd { margin: 0; font: 600 22px/1.1 var(--font-display); font-variant-numeric: tabular-nums; }
+.facts dd small { font: 500 13px var(--font-body); color: var(--ink-3); margin-left: 4px; }
+
+/* findings */
+.findings { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 16px; }
+.finding { background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius); padding: 18px 20px; display: grid; gap: 10px; align-content: start; min-width: 0; }
+.finding h3 { display: flex; align-items: center; gap: 8px; }
+.finding ul { margin: 0; padding-left: 18px; display: grid; gap: 6px; color: var(--ink-2); }
+.finding li::marker { color: var(--c); }
+
+/* controls */
+.phasebar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); padding-block: 10px; margin-block: -10px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; border-bottom: 1px solid var(--rule); }
+.phasebar .label { font-weight: 500; color: var(--ink-2); }
+.seg { display: inline-flex; border: 1px solid var(--rule); border-radius: 999px; padding: 3px; background: var(--surface); flex-wrap: wrap; }
+.seg button, .chips button { font: 500 14px var(--font-body); color: var(--ink-2); background: none; border: 0; border-radius: 999px; padding: 6px 14px; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; }
+.seg button[aria-pressed="true"] { background: var(--control); color: var(--control-ink); }
+.seg button:hover:not([aria-pressed="true"]), .chips button:hover:not([aria-pressed="true"]) { color: var(--ink); }
+button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chips button { border: 1px solid var(--rule); background: var(--surface); padding: 5px 12px; font-size: 13px; font-variant-numeric: tabular-nums; }
+.chips button[aria-pressed="true"] { background: var(--control); color: var(--control-ink); border-color: var(--control); }
+
+/* sections */
+section { display: grid; gap: 14px; min-width: 0; }
+.section-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 10px 20px; }
+.section-head > div { display: grid; gap: 4px; max-width: 62ch; flex: 1 1 280px; }
+.section-head > .seg { flex: none; flex-wrap: nowrap; }
+.panel { background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius); padding: 16px; min-width: 0; }
+.caption { font-size: 13px; color: var(--ink-3); max-width: 75ch; }
+
+/* timeline */
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 13px; color: var(--ink-2); margin-bottom: 8px; }
+.legend span { display: inline-flex; align-items: center; gap: 7px; }
+.legend svg { overflow: visible; }
+.chart-box { position: relative; }
+.chart-box svg { display: block; }
+.chart text { fill: var(--ink-3); font: 500 11px var(--font-body); font-variant-numeric: tabular-nums; }
+.chart .third-label { fill: var(--ink-3); opacity: 0.8; font-size: 10.5px; letter-spacing: 0.06em; text-transform: uppercase; }
+.chart .grid { stroke: var(--rule); stroke-width: 1; }
+.chart .band { fill: var(--c); opacity: 0.16; }
+.chart .l-def { stroke: var(--c); stroke-width: 2.5; fill: none; stroke-linejoin: round; stroke-linecap: round; }
+.chart .l-cen { stroke: var(--c); stroke-width: 1.5; fill: none; stroke-dasharray: 5 4; }
+.chart .l-front { stroke: var(--c); stroke-width: 1.25; fill: none; opacity: 0.65; }
+.chart .goal { stroke: var(--ink-3); stroke-width: 1; stroke-dasharray: 2 3; }
+.chart .goal-label { fill: var(--ink-2); font-size: 11px; }
+.chart .goal-label.for { fill: var(--ink); font-weight: 600; }
+.chart .ht { fill: var(--ink-3); font-size: 10px; letter-spacing: 0.08em; }
+.chart .cross { stroke: var(--ink-3); stroke-width: 1; }
+.chart .dot { fill: var(--surface); stroke: var(--c); stroke-width: 2; }
+.tooltip { position: absolute; pointer-events: none; background: var(--surface); color: var(--ink); border: 1px solid var(--rule); border-radius: var(--radius); box-shadow: 0 4px 16px rgb(0 0 0 / 0.12); padding: 8px 10px; font-size: 13px; min-width: 150px; display: grid; gap: 2px; }
+.tooltip b { font: 600 16px var(--font-display); }
+.tooltip div { display: flex; justify-content: space-between; gap: 16px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.tooltip div span:last-child { color: var(--ink); font-weight: 500; }
+
+/* pitch maps */
+.pitches { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr)); gap: 16px; }
+.pitch-card { display: grid; gap: 8px; min-width: 0; }
+.pitch-card h3 { display: flex; align-items: center; gap: 8px; }
+.pitch-svg { width: 100%; height: auto; display: block; }
+.pitch-svg .turf { fill: var(--pitch); }
+.pitch-svg .pl { fill: none; stroke: var(--pitch-line); stroke-width: 0.35; }
+.pitch-svg .spot { fill: var(--pitch-line); }
+.pitch-svg .hull { fill: var(--c); fill-opacity: 0.14; stroke: var(--c); stroke-opacity: 0.55; stroke-width: 0.35; stroke-linejoin: round; }
+.pitch-svg .player { fill: var(--surface); stroke: var(--c); stroke-width: 0.7; }
+.pitch-svg .player.gk { stroke-dasharray: 0.9 0.6; }
+.pitch-svg .pnum { fill: var(--ink); font: 700 2.3px var(--font-body); text-anchor: middle; dominant-baseline: central; }
+.pitch-svg .dir { fill: var(--ink-3); font: 600 2.4px var(--font-body); letter-spacing: 0.08em; text-transform: uppercase; }
+.empty { color: var(--ink-3); font-size: 14px; padding: 24px 0; }
+
+/* table */
+.table-scroll { overflow-x: auto; border: 1px solid var(--rule); border-radius: var(--radius); background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: 14px; font-variant-numeric: tabular-nums; }
+th, td { padding: 8px 12px; text-align: right; white-space: nowrap; border-bottom: 1px solid var(--rule); }
+th { font: 600 11px/1.2 var(--font-body); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); }
+thead tr:first-child th { font: 600 15px var(--font-display); letter-spacing: 0.02em; text-transform: none; color: var(--ink); }
+th:first-child, td:first-child { text-align: left; }
+td.w { font-family: var(--font-display); font-weight: 600; font-size: 16px; }
+td.goals-cell { text-align: left; color: var(--ink-2); font-size: 13px; }
+tr.half td { background: var(--bg); font: 600 11px var(--font-body); letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); padding-block: 6px; }
+tbody tr:last-child td { border-bottom: 0; }
+.team-start { border-left: 1px solid var(--rule); }
+.bar { display: inline-block; height: 6px; border-radius: 0 3px 3px 0; background: var(--c); opacity: 0.8; margin-right: 8px; vertical-align: middle; }
+
+/* method */
+.method { border-top: 1px solid var(--rule); padding-top: 20px; display: grid; gap: 10px; color: var(--ink-2); font-size: 14px; }
+.method ul { margin: 0; padding-left: 18px; display: grid; gap: 4px; max-width: 80ch; }
+
+@media (max-width: 560px) {
+  .wrap { padding-inline: 16px; gap: 32px; }
+  .panel { padding: 12px 8px; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .seg button, .chips button { transition: background-color 120ms, color 120ms; }
+}
+</style>
+
+<main class="wrap">
+  <header class="masthead">
+    <p class="eyebrow" id="source"></p>
+    <h1 class="scoreline" id="scoreline"></h1>
+    <ol class="goals" id="goals" aria-label="Goals"></ol>
+    <dl class="facts" id="facts"></dl>
+  </header>
+
+  <section aria-labelledby="findings-title">
+    <h2 id="findings-title">Key findings</h2>
+    <div class="findings" id="findings"></div>
+  </section>
+
+  <div class="phasebar" role="toolbar" aria-label="Phase of play">
+    <span class="label">Show each team</span>
+    <div class="seg" id="phase-seg">
+      <button type="button" id="phase-out" data-phase="out_of_possession" aria-pressed="true">Without the ball</button>
+      <button type="button" id="phase-in" data-phase="in_possession" aria-pressed="false">With the ball</button>
+    </div>
+  </div>
+
+  <section aria-labelledby="timeline-title">
+    <div class="section-head">
+      <div>
+        <h2 id="timeline-title">Where the block sat, minute by minute</h2>
+        <p class="muted" id="timeline-sub"></p>
+      </div>
+      <div class="seg" id="team-seg"></div>
+    </div>
+    <div class="panel">
+      <div class="legend" id="legend"></div>
+      <div class="chart-box" id="timeline"></div>
+    </div>
+    <p class="caption">Distance from the team's own goal line, outfield players only. Open play only: dead balls and the 10 seconds after corners and free kicks are removed. Per-minute medians smoothed over 5 minutes. Hover the chart for exact values.</p>
+  </section>
+
+  <section aria-labelledby="shape-title">
+    <div class="section-head">
+      <div>
+        <h2 id="shape-title">Average shape</h2>
+        <p class="muted" id="shape-sub"></p>
+      </div>
+    </div>
+    <div class="chips" id="window-chips" role="group" aria-label="Time window"></div>
+    <div class="pitches" id="pitches"></div>
+    <p class="caption">Each circle is a player's average position in the selected window (keeper dashed). Both teams are drawn attacking left to right. The shaded outline joins the outermost outfield players. Averages smooth out movement, so the team looks more compact here than it ever is in a single moment. Players on for under 30% of the window are left out.</p>
+  </section>
+
+  <section aria-labelledby="table-title">
+    <div class="section-head">
+      <div>
+        <h2 id="table-title">15-minute breakdown</h2>
+        <p class="muted" id="table-sub"></p>
+      </div>
+    </div>
+    <div class="table-scroll"><table id="breakdown"></table></div>
+    <p class="caption">Medians per window, in meters. Back line = deepest outfield player. Length = back line to front line. Time = minutes spent in this phase during the window. Stoppage time counts toward the last window of each half.</p>
+  </section>
+
+  <footer class="method">
+    <h3>How this is measured</h3>
+    <ul id="method"></ul>
+  </footer>
+</main>
+
+<script type="application/json" id="report-data">__REPORT_DATA__</script>
+<script>
+(() => {
+  const D = JSON.parse(document.getElementById("report-data").textContent);
+  const NS = "http://www.w3.org/2000/svg";
+  const TEAMS = ["home", "away"];
+  const PHASE_TEXT = { out_of_possession: "without the ball", in_possession: "with the ball" };
+  const [PITCH_L, PITCH_W] = D.pitch;
+  const state = { phase: "out_of_possession", team: "home", window: "Full match" };
+
+  const $ = (id) => document.getElementById(id);
+  const name = (t) => D.names[t];
+  // match-clock convention: 0:00-0:59 is the 1st minute
+  const clock = (m) => `${Math.floor(m) + 1}′`;
+  const svgEl = (tag, attrs = {}, parent) => {
+    const e = document.createElementNS(NS, tag);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(e);
+    return e;
+  };
+  const html = (tag, attrs = {}, text) => {
+    const e = document.createElement(tag);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (text !== undefined) e.textContent = text;
+    return e;
+  };
+  const chip = (team) => html("span", { class: `chip team-${team}`, "aria-hidden": "true" });
+  const pct = (v) => `${Math.round(v * 100)}%`;
+  const m0 = (v) => (v == null ? "–" : `${Math.round(v)}`);
+
+  // ---------- masthead ----------
+  $("source").textContent = `Match shape report · ${D.source}`;
+  const score = $("scoreline");
+  TEAMS.forEach((t, i) => {
+    const side = html("span", { class: "side" });
+    side.append(chip(t), document.createTextNode(name(t)));
+    if (i === 1) score.append(html("span", { class: "score" }, `${D.score[0]}–${D.score[1]}`));
+    score.append(side);
+  });
+  D.goals.forEach((g) => {
+    const li = html("li");
+    li.append(chip(g.team), html("b", {}, clock(g.m)), document.createTextNode(`${name(g.team)} · ${g.score}`));
+    $("goals").append(li);
+  });
+  const fact = (label, value, small) => {
+    const d = html("div");
+    const dd = html("dd", { class: "num" }, value);
+    if (small) dd.append(html("small", {}, small));
+    d.append(html("dt", {}, label), dd);
+    $("facts").append(d);
+  };
+  fact("Possession", `${pct(D.possession.home)} – ${pct(D.possession.away)}`, `${name("home")} – ${name("away")}`);
+  fact("Ball in play", pct(D.in_play), "of match time");
+  fact("Goals", `${D.goals.length}`);
+
+  // ---------- findings ----------
+  TEAMS.forEach((t) => {
+    const card = html("article", { class: `finding team-${t}` });
+    const h = html("h3");
+    h.append(chip(t), document.createTextNode(name(t)));
+    const ul = html("ul");
+    D.findings[t].forEach((line) => ul.append(html("li", {}, line)));
+    card.append(h, ul);
+    $("findings").append(card);
+  });
+
+  // ---------- controls ----------
+  const setPressed = (container, attr, value) =>
+    container.querySelectorAll("button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset[attr] === value)));
+
+  $("phase-seg").addEventListener("click", (e) => {
+    const b = e.target.closest("button");
+    if (!b) return;
+    state.phase = b.dataset.phase;
+    setPressed($("phase-seg"), "phase", state.phase);
+    renderAll();
+  });
+
+  TEAMS.forEach((t) => {
+    const b = html("button", { type: "button", id: `team-${t}`, "data-team": t, "aria-pressed": String(t === state.team) });
+    b.append(chip(t), document.createTextNode(name(t)));
+    $("team-seg").append(b);
+  });
+  $("team-seg").addEventListener("click", (e) => {
+    const b = e.target.closest("button");
+    if (!b) return;
+    state.team = b.dataset.team;
+    setPressed($("team-seg"), "team", state.team);
+    drawTimeline();
+  });
+
+  const windowOrder = (() => {
+    const keys = new Set();
+    TEAMS.forEach((t) => Object.values(D.shapes[t] || {}).forEach((w) => Object.keys(w).forEach((k) => keys.add(k))));
+    const fifteen = [...keys].filter((k) => /^\d+-\d+'$/.test(k)).sort((a, b) => parseInt(a) - parseInt(b));
+    return ["Full match", "1st half", "2nd half", ...fifteen].filter((k) => keys.has(k));
+  })();
+  const windowLabel = (k) => k.replace("-", "–").replace("'", "′");
+  windowOrder.forEach((k, i) => {
+    const b = html("button", { type: "button", id: `win-${i}`, "data-win": k, "aria-pressed": String(k === state.window) }, windowLabel(k));
+    $("window-chips").append(b);
+  });
+  $("window-chips").addEventListener("click", (e) => {
+    const b = e.target.closest("button");
+    if (!b) return;
+    state.window = b.dataset.win;
+    setPressed($("window-chips"), "win", state.window);
+    drawPitches();
+  });
+
+  // ---------- timeline ----------
+  const legendItems = [
+    ["Back line", (s) => svgEl("line", { x1: 0, y1: 6, x2: 22, y2: 6, class: "l-def" }, s)],
+    ["Centroid", (s) => svgEl("line", { x1: 0, y1: 6, x2: 22, y2: 6, class: "l-cen" }, s)],
+    ["Front line", (s) => svgEl("line", { x1: 0, y1: 6, x2: 22, y2: 6, class: "l-front" }, s)],
+    ["Block (back to front)", (s) => svgEl("rect", { x: 0, y: 1, width: 22, height: 10, class: "band", rx: 2 }, s)],
+  ];
+
+  function drawLegend() {
+    const box = $("legend");
+    box.replaceChildren();
+    legendItems.forEach(([label, draw]) => {
+      const span = html("span");
+      const s = svgEl("svg", { width: 22, height: 12, class: `chart team-${state.team}`, "aria-hidden": "true" });
+      draw(s);
+      span.append(s, document.createTextNode(label));
+      box.append(span);
+    });
+  }
+
+  function drawTimeline() {
+    drawLegend();
+    $("timeline-sub").textContent = `${name(state.team)} ${PHASE_TEXT[state.phase]}. Switch team on the right; the dotted lines are goals, with the score after each.`;
+    const box = $("timeline");
+    box.replaceChildren();
+    const W = box.clientWidth || 800;
+    const H = W < 560 ? 270 : 340;
+    const mg = { l: 40, r: 8, t: 34, b: 26 };
+    const pw = W - mg.l - mg.r, ph = H - mg.t - mg.b;
+    const gap = 3;
+    const spans = D.halves.map((h) => h.end - h.start);
+    const total = spans.reduce((a, b) => a + b, 0) + gap * (D.halves.length - 1);
+    const X = (minute, p) => {
+      let off = 0;
+      for (const h of D.halves) {
+        if (h.p === p) return mg.l + ((off + minute - h.start) / total) * pw;
+        off += h.end - h.start + gap;
+      }
+    };
+    const Y = (v) => mg.t + (1 - v / PITCH_L) * ph;
+    const svg = svgEl("svg", { width: W, height: H, viewBox: `0 0 ${W} ${H}`, class: `chart team-${state.team}`, role: "img",
+      "aria-label": `${name(state.team)} back line, centroid and front line ${PHASE_TEXT[state.phase]}, by minute` });
+
+    // pitch thirds
+    [35, 70].forEach((v) => svgEl("line", { x1: mg.l, x2: W - mg.r, y1: Y(v), y2: Y(v), class: "grid" }, svg));
+    svgEl("line", { x1: mg.l, x2: W - mg.r, y1: Y(0), y2: Y(0), class: "grid" }, svg);
+    [["Defensive third", 17.5], ["Middle third", 52.5], ["Attacking third", 87.5]].forEach(([label, v]) =>
+      (svgEl("text", { x: mg.l + 6, y: Y(v) + 4, class: "third-label" }, svg).textContent = label));
+    [0, 35, 70, 105].forEach((v) =>
+      (svgEl("text", { x: mg.l - 6, y: Y(v) + 4, "text-anchor": "end" }, svg).textContent = `${v} m`));
+
+    D.halves.forEach((h, i) => {
+      for (let m = h.start; m <= h.end; m += 15)
+        svgEl("text", { x: X(m, h.p), y: H - 8, "text-anchor": m === h.start ? "start" : "middle" }, svg).textContent = `${m}′`;
+      if (i > 0) {
+        const prev = D.halves[i - 1];
+        const x = (X(prev.end, prev.p) + X(h.start, h.p)) / 2;
+        svgEl("text", { x, y: Y(52.5) + 4, "text-anchor": "middle", class: "ht" }, svg).textContent = "HT";
+      }
+    });
+
+    const series = D.series[state.team][state.phase];
+    D.halves.forEach((h) => {
+      const pts = series.filter((d) => d.p === h.p && d.def_line != null);
+      if (!pts.length) return;
+      const px = (d) => X(d.m + 0.5, d.p).toFixed(1);
+      const line = (key) => pts.map((d, i) => `${i ? "L" : "M"}${px(d)},${Y(d[key]).toFixed(1)}`).join("");
+      const band = line("front_line") + [...pts].reverse().map((d) => `L${px(d)},${Y(d.def_line).toFixed(1)}`).join("") + "Z";
+      svgEl("path", { d: band, class: "band" }, svg);
+      svgEl("path", { d: line("front_line"), class: "l-front" }, svg);
+      svgEl("path", { d: line("centroid"), class: "l-cen" }, svg);
+      svgEl("path", { d: line("def_line"), class: "l-def" }, svg);
+    });
+
+    D.goals.forEach((g, i) => {
+      const x = X(g.m, g.p);
+      svgEl("line", { x1: x, x2: x, y1: mg.t - 4, y2: Y(0), class: "goal" }, svg);
+      const t = svgEl("text", { x: x + 4, y: i % 2 ? 26 : 13, class: `goal-label${g.team === state.team ? " for" : ""}` }, svg);
+      t.textContent = `${g.score} ${clock(g.m)}`;
+    });
+
+    // hover layer: crosshair + tooltip on the nearest minute
+    const cross = svgEl("line", { y1: mg.t, y2: Y(0), class: "cross", visibility: "hidden" }, svg);
+    const dots = ["def_line", "centroid", "front_line"].map(() => svgEl("circle", { r: 4, class: "dot", visibility: "hidden" }, svg));
+    const hit = svgEl("rect", { x: mg.l, y: mg.t, width: pw, height: ph, fill: "transparent" }, svg);
+    const tip = html("div", { class: "tooltip", hidden: "" });
+    box.append(svg, tip);
+    const points = series.filter((d) => d.def_line != null).map((d) => ({ d, x: X(d.m + 0.5, d.p) }));
+    const hide = () => { tip.hidden = true; cross.setAttribute("visibility", "hidden"); dots.forEach((c) => c.setAttribute("visibility", "hidden")); };
+    hit.addEventListener("pointermove", (e) => {
+      const r = svg.getBoundingClientRect();
+      const mx = e.clientX - r.left;
+      let best = null;
+      for (const p of points) if (!best || Math.abs(p.x - mx) < Math.abs(best.x - mx)) best = p;
+      if (!best || Math.abs(best.x - mx) > 20) return hide();
+      const d = best.d;
+      cross.setAttribute("x1", best.x); cross.setAttribute("x2", best.x); cross.setAttribute("visibility", "visible");
+      ["def_line", "centroid", "front_line"].forEach((k, i) => {
+        dots[i].setAttribute("cx", best.x); dots[i].setAttribute("cy", Y(d[k])); dots[i].setAttribute("visibility", "visible");
+      });
+      tip.replaceChildren(html("b", {}, `${d.m + 1}′`));
+      [["Front line", d.front_line], ["Centroid", d.centroid], ["Back line", d.def_line], ["Length", d.length], ["Width", d.width]].forEach(([k, v]) => {
+        const row = html("div");
+        row.append(html("span", {}, k), html("span", {}, `${m0(v)} m`));
+        tip.append(row);
+      });
+      tip.hidden = false;
+      const tw = tip.offsetWidth;
+      const left = best.x + 14 + tw > W ? best.x - 14 - tw : best.x + 14;
+      tip.style.left = `${left}px`;
+      tip.style.top = `${mg.t}px`;
+    });
+    hit.addEventListener("pointerleave", hide);
+  }
+
+  // ---------- pitch maps ----------
+  function hull(points) {
+    const p = points.slice().sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+    if (p.length < 3) return p;
+    const cross = (o, a, b) => (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]);
+    const lower = [], upper = [];
+    for (const q of p) { while (lower.length >= 2 && cross(lower.at(-2), lower.at(-1), q) <= 0) lower.pop(); lower.push(q); }
+    for (const q of p.reverse()) { while (upper.length >= 2 && cross(upper.at(-2), upper.at(-1), q) <= 0) upper.pop(); upper.push(q); }
+    return lower.slice(0, -1).concat(upper.slice(0, -1));
+  }
+
+  function drawPitchMarkings(svg) {
+    const L = PITCH_L, Wd = PITCH_W, mid = Wd / 2;
+    svgEl("rect", { x: -2.5, y: -2.5, width: L + 5, height: Wd + 5, class: "turf", rx: 1 }, svg);
+    svgEl("rect", { x: 0, y: 0, width: L, height: Wd, class: "pl" }, svg);
+    svgEl("line", { x1: L / 2, x2: L / 2, y1: 0, y2: Wd, class: "pl" }, svg);
+    svgEl("circle", { cx: L / 2, cy: mid, r: 9.15, class: "pl" }, svg);
+    svgEl("circle", { cx: L / 2, cy: mid, r: 0.45, class: "spot" }, svg);
+    [[0, 1], [L, -1]].forEach(([gx, s]) => {
+      const box = (depth, width) => svgEl("rect", { x: s > 0 ? gx : gx - depth, y: mid - width / 2, width: depth, height: width, class: "pl" }, svg);
+      box(16.5, 40.32);
+      box(5.5, 18.32);
+      svgEl("rect", { x: s > 0 ? gx - 1.8 : gx, y: mid - 3.66, width: 1.8, height: 7.32, class: "pl" }, svg);
+      svgEl("circle", { cx: gx + s * 11, cy: mid, r: 0.45, class: "spot" }, svg);
+      const a = Math.acos((16.5 - 11) / 9.15);
+      const x1 = gx + s * (11 + 9.15 * Math.cos(a));
+      svgEl("path", { d: `M${x1},${mid - 9.15 * Math.sin(a)} A9.15,9.15 0 0 ${s > 0 ? 1 : 0} ${x1},${mid + 9.15 * Math.sin(a)}`, class: "pl" }, svg);
+    });
+  }
+
+  function drawPitches() {
+    const wl = windowLabel(state.window);
+    $("shape-sub").textContent = `Average positions ${PHASE_TEXT[state.phase]}, ${state.window === "Full match" ? "whole match" : wl}.`;
+    const box = $("pitches");
+    box.replaceChildren();
+    TEAMS.forEach((t) => {
+      const card = html("div", { class: `pitch-card team-${t}` });
+      const h = html("h3");
+      h.append(chip(t), document.createTextNode(`${name(t)} ${PHASE_TEXT[state.phase]}`));
+      card.append(h);
+      const players = ((D.shapes[t] || {})[state.phase] || {})[state.window];
+      if (!players || !players.length) {
+        card.append(html("p", { class: "empty" }, "Not enough time in this phase during the window."));
+        box.append(card);
+        return;
+      }
+      const svg = svgEl("svg", { viewBox: `-3 -6.5 ${PITCH_L + 6} ${PITCH_W + 10}`, class: "pitch-svg", role: "img",
+        "aria-label": `${name(t)} average positions ${PHASE_TEXT[state.phase]}, ${wl}` });
+      drawPitchMarkings(svg);
+      const own = svgEl("text", { x: 0, y: -3.6, class: "dir" }, svg);
+      own.textContent = "Own goal";
+      const att = svgEl("text", { x: PITCH_L, y: -3.6, class: "dir", "text-anchor": "end" }, svg);
+      att.textContent = "Attacking →";
+      const outfield = players.filter((p) => !p.gk).map((p) => [p.x, p.y]);
+      const hp = hull(outfield);
+      if (hp.length >= 3) svgEl("polygon", { points: hp.map((q) => q.join(",")).join(" "), class: "hull" }, svg);
+      players.forEach((p) => {
+        const g = svgEl("g", {}, svg);
+        svgEl("circle", { cx: p.x, cy: p.y, r: 2.3, class: `player${p.gk ? " gk" : ""}` }, g);
+        svgEl("text", { x: p.x, y: p.y + 0.1, class: "pnum" }, g).textContent = p.n;
+        svgEl("title", {}, g).textContent = `#${p.n}${p.gk ? " (keeper)" : ""}: ${Math.round(p.x)} m from own goal`;
+      });
+      card.append(svg);
+      box.append(card);
+    });
+  }
+
+  // ---------- table ----------
+  function goalWindow(g) {
+    const half = g.m - 45 * (g.p - 1);
+    const start = Math.min(Math.floor(half / 15), 2) * 15 + 45 * (g.p - 1);
+    return `${start}-${start + 15}'`;
+  }
+
+  function drawTable() {
+    $("table-sub").textContent = `Both teams ${PHASE_TEXT[state.phase]}.`;
+    const table = $("breakdown");
+    table.replaceChildren();
+    const cols = [["minutes", "Time"], ["def_line", "Back line"], ["centroid", "Centroid"], ["length", "Length"], ["width", "Width"]];
+    const thead = html("thead");
+    const top = html("tr");
+    top.append(html("th", { scope: "col" }, ""));
+    TEAMS.forEach((t) => {
+      const th = html("th", { colspan: cols.length, scope: "colgroup", class: `team-start team-${t}` });
+      th.append(chip(t), document.createTextNode(` ${name(t)}`));
+      top.append(th);
+    });
+    top.append(html("th", { scope: "col" }, ""));
+    const sub = html("tr");
+    sub.append(html("th", { scope: "col" }, "Window"));
+    TEAMS.forEach((t) => cols.forEach(([, label], i) => sub.append(html("th", { scope: "col", class: i === 0 ? "team-start" : "" }, label))));
+    sub.append(html("th", { scope: "col", style: "text-align:left" }, "Goals"));
+    thead.append(top, sub);
+
+    const rows = D.table.filter((r) => r.phase === state.phase);
+    const windows = [...new Map(rows.map((r) => [r.window, r])).values()].sort((a, b) => a.period - b.period || parseInt(a.window) - parseInt(b.window));
+    const tbody = html("tbody");
+    let lastPeriod = null;
+    windows.forEach((w) => {
+      if (w.period !== lastPeriod) {
+        const tr = html("tr", { class: "half" });
+        tr.append(html("td", { colspan: 2 + cols.length * 2 }, w.period === 1 ? "1st half" : "2nd half"));
+        tbody.append(tr);
+        lastPeriod = w.period;
+      }
+      const tr = html("tr");
+      tr.append(html("td", { class: "w" }, w.label));
+      TEAMS.forEach((t) => {
+        const r = rows.find((x) => x.team === t && x.window === w.window) || {};
+        cols.forEach(([key], i) => {
+          const td = html("td", { class: `${i === 0 ? "team-start " : ""}team-${t}` });
+          if (key === "minutes") td.textContent = r.minutes == null ? "–" : `${r.minutes.toFixed(1)} min`;
+          else if (key === "def_line" && r.def_line != null) {
+            const bar = html("span", { class: "bar", "aria-hidden": "true" });
+            bar.style.width = `${Math.round(r.def_line * 0.9)}px`;
+            td.append(bar, document.createTextNode(`${m0(r.def_line)} m`));
+          } else td.textContent = r[key] == null ? "–" : `${m0(r[key])} m`;
+          tr.append(td);
+        });
+      });
+      const goals = D.goals.filter((g) => goalWindow(g) === w.window).map((g) => `${g.score} ${clock(g.m)}`);
+      tr.append(html("td", { class: "goals-cell" }, goals.join(", ")));
+      tbody.append(tr);
+    });
+    table.append(thead, tbody);
+  }
+
+  // ---------- method ----------
+  [
+    `Source: ${D.source}. Full tracking of all 22 players and the ball, analysed at 5 frames per second.`,
+    "Possession comes from the event log: a team has the ball from its pass, recovery, shot or restart until the opponent wins it. Dead-ball time and the 10 seconds after corners and free kicks are left out, so the numbers describe open play.",
+    "Distances are measured from each team's own goal line, so both teams and both halves read the same way. Keepers are excluded from all block measures.",
+    "Back line is the deepest outfield player (the offside line); front line is the most advanced; centroid is the team's average position; width is the spread across the pitch.",
+    "Key findings are generated from the data with fixed rules: a change under 3 m between halves is reported as no change.",
+  ].forEach((line) => $("method").append(html("li", {}, line)));
+
+  function renderAll() {
+    drawTimeline();
+    drawPitches();
+    drawTable();
+  }
+  renderAll();
+  let lastWidth = $("timeline").clientWidth;
+  new ResizeObserver(() => {
+    const w = $("timeline").clientWidth;
+    if (w !== lastWidth) { lastWidth = w; drawTimeline(); }
+  }).observe($("timeline"));
+})();
+</script>
