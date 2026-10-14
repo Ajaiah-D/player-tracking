@@ -7,7 +7,7 @@ can be rebuilt on other data.
 ```
 python scripts/download_metrica.py --game 1     # ~66 MB, once
 python analyze_shape.py --game 1 --open         # ~30 s on CPU, opens the report
-python -m pytest tests                          # 6 tests, <1 s
+python -m pytest tests                          # 7 tests, <1 s
 ```
 
 Outputs land in `output/shape/metrica_game1/`:
