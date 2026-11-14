@@ -60,7 +60,7 @@ Practical rules that came out of calibrating the sample clip:
   Prefer the two intersections of the circle with the halfway line,
   which are exact.
 
-## Known failure modes (be honest with yourself about these)
+## Known failure modes
 
 - **Camera cuts.** The calibration is tied to one continuous camera
   shot. A hard cut (replay, close-up, reverse angle) breaks the

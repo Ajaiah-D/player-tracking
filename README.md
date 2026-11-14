@@ -105,7 +105,7 @@ angle. For the one long possession phase (12.6 s), the defending team
 classified as 5-3-2 with a reasonable margin (cost 0.128 vs 0.130 for
 5-4-1) and the attacking team as 4-4-2 in a near-tie with 3-4-3
 (0.157 vs 0.170). Shorter segments (1-3 s) produced unstable,
-low-margin labels. Honest read: defensive shape on long phases is
+low-margin labels. In short: defensive shape on long phases is
 credible; in-possession shape from a few seconds of average positions
 is closer to a guess, and 30 s of footage is simply not enough to call
 a team's formation. The per-phase `ranking` costs are in the JSON so
